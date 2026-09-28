@@ -46,6 +46,41 @@
   #coordEl{opacity:.35;font-size:9.5px}
   .menu-btn{position:fixed;top:16px;right:18px;z-index:20;font:inherit;font-size:11px;letter-spacing:.20em;text-transform:uppercase;background:transparent;color:var(--ink);border:1px solid var(--line);padding:8px 17px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
   .menu-btn:hover{background:var(--ink);color:#0f0c08}
+  .capsule-btn{right:104px}
+
+  .capsule-modal{position:fixed;inset:0;z-index:75;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:18px}
+  .capsule-modal.on{display:flex}
+  .capsule-box{
+    background:#15110b;color:var(--ink);border-radius:14px;padding:18px;
+    width:min(700px,100%);max-height:88vh;display:flex;flex-direction:column;gap:12px;
+    box-shadow:0 30px 90px rgba(0,0,0,.65);border:1px solid var(--line);
+    overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  }
+  .capsule-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+  .capsule-head-title{font-size:11px;letter-spacing:.26em;text-transform:uppercase;opacity:.75}
+  .capsule-head-sub{font-size:9px;letter-spacing:.06em;opacity:.4;margin-top:5px;line-height:1.5}
+  .capsule-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .capsule-card{border:1px solid var(--line);border-radius:10px;padding:11px;background:rgba(232,226,212,.025);min-width:0}
+  .capsule-card.occupied{border-color:rgba(200,212,58,.30);background:rgba(200,212,58,.035)}
+  .capsule-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .capsule-name{font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
+  .capsule-state{font-size:8px;letter-spacing:.14em;text-transform:uppercase;opacity:.45}
+  .capsule-state.saved{opacity:.85;color:var(--mold)}
+  .capsule-info{min-height:38px;font-size:9px;line-height:1.6;letter-spacing:.05em;opacity:.56;word-break:break-word}
+  .capsule-rarity{font-weight:700;letter-spacing:.12em}
+  .capsule-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:9px}
+  .capsule-actions button{font:inherit;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;background:transparent;color:var(--ink);border:1px solid var(--line);padding:8px 5px;border-radius:7px;cursor:pointer;transition:background .15s,color .15s,opacity .15s}
+  .capsule-actions button:hover:not(:disabled){background:var(--ink);color:#0f0c08}
+  .capsule-actions button:disabled{opacity:.2;cursor:not-allowed}
+  .capsule-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--line)}
+  .capsule-footer-note{font-size:8.5px;letter-spacing:.06em;opacity:.36;line-height:1.5}
+  .capsule-close{font:inherit;font-size:9px;letter-spacing:.16em;text-transform:uppercase;background:transparent;color:var(--ink);border:1px solid var(--line);padding:9px 13px;border-radius:7px;cursor:pointer}
+  .capsule-close:hover{background:var(--ink);color:#0f0c08}
+  @media (max-width:560px){
+    .capsule-btn{right:104px}
+    .capsule-grid{grid-template-columns:1fr}
+    .capsule-box{max-height:92vh;padding:14px}
+  }
 
   .warp-btn{
     position:fixed; left:18px; top:80px; z-index:25;
@@ -211,6 +246,7 @@
   <div class="sb-hint" id="sbHint">arm food button to place</div>
 </div>
 
+<button id="capsuleBtn" class="menu-btn capsule-btn">capsules</button>
 <button id="menuBtn" class="menu-btn">menu</button>
 
 <aside id="panel" class="panel" aria-hidden="true">
@@ -265,21 +301,13 @@
     <label class="row"><span>wander</span><span class="switch"><input type="checkbox" id="optWander" checked><span class="track"><span class="knob"></span></span></span></label>
   </section>
 
-  <section class="sec">
+  <section class="sec" style="border-bottom:0">
     <h4>redeem code</h4>
     <input type="text" id="redeemInput" class="redeem-input" placeholder="ENTER CODE" autocomplete="off" spellcheck="false" autocapitalize="characters">
     <button id="redeemBtn" class="wide">redeem</button>
     <p class="note" id="redeemStatus">enter a code to unlock special bonuses</p>
   </section>
 
-  <section class="sec" style="border-bottom:0">
-    <h4>culture file</h4>
-    <button id="shareBtn" class="wide">save / share culture</button>
-    <button id="showTextBtn" class="wide">show culture code</button>
-    <button id="loadBtn" class="wide">load culture file</button>
-    <button id="pasteBtn" class="wide">load from clipboard</button>
-    <input type="file" id="fileInput" hidden>
-  </section>
 </aside>
 
 <div class="hud">
@@ -291,6 +319,23 @@
 </div>
 
 <div id="toast" class="toast"></div>
+
+<div id="capsuleModal" class="capsule-modal">
+  <div class="capsule-box">
+    <div class="capsule-head">
+      <div>
+        <div class="capsule-head-title">mold capsules · 10 slots</div>
+        <div class="capsule-head-sub">Store full mold cultures here. Capsules stay saved in this browser.</div>
+      </div>
+      <button id="capsuleClose" class="icon-btn" aria-label="close">✕</button>
+    </div>
+    <div id="capsuleGrid" class="capsule-grid"></div>
+    <div class="capsule-footer">
+      <div class="capsule-footer-note">SAVE replaces a slot. LOAD equips its mold. CLEAR empties the slot.</div>
+      <button id="capsuleCloseBottom" class="capsule-close">close</button>
+    </div>
+  </div>
+</div>
 
 <div id="modal" class="modal">
   <div class="modal-box">
@@ -2076,7 +2121,6 @@ const fullVal   = document.getElementById('fullVal');
 const fullBar   = document.getElementById('fullBar');
 const stackVal  = document.getElementById('stackVal');
 const foodsEl   = document.getElementById('foods');
-const fileInput = document.getElementById('fileInput');
 const toastEl   = document.getElementById('toast');
 const foodCountEl = document.getElementById('foodCount');
 const viewVal   = document.getElementById('viewVal');
@@ -2084,6 +2128,13 @@ const warpBtn   = document.getElementById('warpBtn');
 const warpLbl   = document.getElementById('warpLbl');
 const foodBtn   = document.getElementById('foodBtn');
 const foodLbl   = document.getElementById('foodLbl');
+
+const capsuleBtn = document.getElementById('capsuleBtn');
+const capsuleModal = document.getElementById('capsuleModal');
+const capsuleGrid = document.getElementById('capsuleGrid');
+const CAPSULE_COUNT = 10;
+const CAPSULE_STORAGE_KEY = 'petMoldCapsulesV1';
+let capsuleSlots = loadCapsuleSlots();
 
 const scoreboard = document.getElementById('scoreboard');
 const sbRarity = document.getElementById('sbRarity');
@@ -2238,6 +2289,132 @@ function toast(msg, ms){
 function openPanel(){ panel.classList.add('open'); panel.setAttribute('aria-hidden','false'); }
 function closePanel(){ panel.classList.remove('open'); panel.setAttribute('aria-hidden','true'); }
 
+function loadCapsuleSlots(){
+  const empty = Array.from({length: CAPSULE_COUNT}, () => null);
+  try {
+    const raw = localStorage.getItem(CAPSULE_STORAGE_KEY);
+    if (!raw) return empty;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return empty;
+    for (let i = 0; i < CAPSULE_COUNT; i++){
+      empty[i] = (parsed[i] && typeof parsed[i] === 'object') ? parsed[i] : null;
+    }
+  } catch(err){}
+  return empty;
+}
+
+function saveCapsuleSlots(){
+  try {
+    localStorage.setItem(CAPSULE_STORAGE_KEY, JSON.stringify(capsuleSlots));
+    return true;
+  } catch(err){
+    toast('capsule storage unavailable', 2200);
+    return false;
+  }
+}
+
+function capsuleSummary(slot, info){
+  info.textContent = '';
+  if (!slot){
+    info.textContent = 'EMPTY — save the current mold here.';
+    return;
+  }
+  const rar = String(slot.rarity || 'UNKNOWN');
+  const beh = String(slot.behavior || 'normal');
+  const lvl = typeof slot.sizeLevel === 'number' ? slot.sizeLevel : '—';
+  const nm = String(slot.name || 'unnamed');
+  const rarityEl = document.createElement('span');
+  rarityEl.className = 'capsule-rarity';
+  rarityEl.textContent = rar;
+  rarityEl.style.color = (RARITY_BY_NAME[rar] || RARITIES[0]).color;
+  info.appendChild(rarityEl);
+  info.appendChild(document.createTextNode(' · ' + nm));
+  info.appendChild(document.createElement('br'));
+  info.appendChild(document.createTextNode('size ' + lvl + ' / ' + MAX_LEVEL + ' · ' + beh));
+}
+
+function renderCapsules(){
+  capsuleGrid.innerHTML = '';
+  capsuleSlots.forEach((slot, index) => {
+    const card = document.createElement('div');
+    card.className = 'capsule-card' + (slot ? ' occupied' : '');
+
+    const top = document.createElement('div');
+    top.className = 'capsule-top';
+    const name = document.createElement('span');
+    name.className = 'capsule-name';
+    name.textContent = 'capsule ' + String(index + 1).padStart(2, '0');
+    const status = document.createElement('span');
+    status.className = 'capsule-state' + (slot ? ' saved' : '');
+    status.textContent = slot ? 'saved' : 'empty';
+    top.append(name, status);
+
+    const info = document.createElement('div');
+    info.className = 'capsule-info';
+    capsuleSummary(slot, info);
+
+    const actions = document.createElement('div');
+    actions.className = 'capsule-actions';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'save';
+    saveBtn.addEventListener('click', () => {
+      capsuleSlots[index] = buildSaveObject();
+      if (saveCapsuleSlots()){
+        renderCapsules();
+        toast('saved mold to capsule ' + (index + 1), 1800);
+      }
+    });
+
+    const loadBtn = document.createElement('button');
+    loadBtn.textContent = 'load';
+    loadBtn.disabled = !slot;
+    loadBtn.addEventListener('click', () => {
+      const saved = capsuleSlots[index];
+      if (!saved) return;
+      try {
+        applyLoaded(saved);
+        closeCapsules();
+        toast('loaded capsule ' + (index + 1) + ' — ' + strainName, 2200);
+      } catch(err){
+        toast('that capsule is invalid', 1800);
+      }
+    });
+
+    const clearBtn = document.createElement('button');
+    clearBtn.textContent = 'clear';
+    clearBtn.disabled = !slot;
+    clearBtn.addEventListener('click', () => {
+      if (!capsuleSlots[index]) return;
+      capsuleSlots[index] = null;
+      if (saveCapsuleSlots()){
+        renderCapsules();
+        toast('cleared capsule ' + (index + 1), 1500);
+      }
+    });
+
+    actions.append(saveBtn, loadBtn, clearBtn);
+    card.append(top, info, actions);
+    capsuleGrid.appendChild(card);
+  });
+}
+
+function openCapsules(){
+  renderCapsules();
+  capsuleModal.classList.add('on');
+}
+function closeCapsules(){ capsuleModal.classList.remove('on'); }
+
+capsuleBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  openCapsules();
+});
+document.getElementById('capsuleClose').addEventListener('click', closeCapsules);
+document.getElementById('capsuleCloseBottom').addEventListener('click', closeCapsules);
+capsuleModal.addEventListener('click', e => {
+  if (e.target === capsuleModal) closeCapsules();
+});
+
 document.getElementById('menuBtn').addEventListener('click', () => {
   panel.classList.contains('open') ? closePanel() : openPanel();
 });
@@ -2245,6 +2422,12 @@ document.getElementById('closeBtn').addEventListener('click', closePanel);
 
 document.getElementById('rerollBtn').addEventListener('click', () => {
   state.stack = 0; state.fullness = 0;
+  // A reroll should always produce a fully colored mold.
+  // Preserve appearance settings unless the current appearance is actually colorless.
+  if (state.settings.monochrome || state.settings.saturation <= 0){
+    state.settings.monochrome = false;
+    state.settings.saturation = 0.85;
+  }
   newCulture();
 });
 document.getElementById('feedBtn').addEventListener('click', () => {
@@ -2560,7 +2743,7 @@ window.addEventListener('keydown', e => {
     toast(placeFoodArmed ? 'place food armed' : 'placing cancelled', 1200);
   }
   else if (e.key === 'Escape'){
-    closePanel(); closeModal(); closeOdds();
+    closePanel(); closeCapsules(); closeModal(); closeOdds();
     if (placeFoodArmed){ placeFoodArmed = false; updateFoodBtnUI(); }
   }
   else if (e.key === '+' || e.key === '='){
@@ -2575,8 +2758,17 @@ window.addEventListener('keydown', e => {
 
 function buildSaveObject(){
   return {
-    format:'petmold', version: 30, savedAt:new Date().toISOString(),
+    format:'petmold', version: 31, savedAt:new Date().toISOString(),
     name: strainName, seed: seed, hue: hashHue(seed),
+    // Store the generated variant too so capsule loads preserve the exact mold color.
+    variant: variant ? {
+      hueBase: +variant.hueBase,
+      hueName: variant.hueName,
+      speedMul: +variant.speedMul,
+      thicknessMul: +variant.thicknessMul,
+      speedLabel: variant.speedLabel,
+      rootsLabel: variant.rootsLabel
+    } : null,
     fullness: +state.fullness.toFixed(4),
     stack: state.stack,
     sizeLevel: state.sizeLevel,
@@ -2697,6 +2889,20 @@ function applyLoaded(d){
     if (typeof s.wander === 'boolean')     state.settings.wander = s.wander;
   }
   newCulture(d.seed, typeof d.name === 'string' ? d.name : undefined, preset);
+
+  // Reapply the exact stored variant after generating the culture so a capsule
+  // restores the same color/variant instead of deriving a fresh appearance.
+  if (d.variant && typeof d.variant === 'object' && variant){
+    if (typeof d.variant.hueBase === 'number' && isFinite(d.variant.hueBase)) variant.hueBase = d.variant.hueBase;
+    if (typeof d.variant.hueName === 'string') variant.hueName = d.variant.hueName;
+    if (typeof d.variant.speedMul === 'number' && isFinite(d.variant.speedMul)) variant.speedMul = d.variant.speedMul;
+    if (typeof d.variant.thicknessMul === 'number' && isFinite(d.variant.thicknessMul)) variant.thicknessMul = d.variant.thicknessMul;
+    if (typeof d.variant.speedLabel === 'string') variant.speedLabel = d.variant.speedLabel;
+    if (typeof d.variant.rootsLabel === 'string') variant.rootsLabel = d.variant.rootsLabel;
+    AGENT_SPEED = (1 / GW) * variant.speedMul;
+    refreshPalette();
+    syncUI();
+  }
 }
 
 function loadMoldFile(file){
@@ -2720,23 +2926,6 @@ async function loadFromClipboard(){
   } catch(err){ openModal('load', ''); }
 }
 
-document.getElementById('shareBtn').addEventListener('click', saveMold);
-document.getElementById('showTextBtn').addEventListener('click', () => openModal('copy', moldFile().text));
-document.getElementById('loadBtn').addEventListener('click', () => fileInput.click());
-document.getElementById('pasteBtn').addEventListener('click', loadFromClipboard);
-
-fileInput.setAttribute('accept', 'text/plain,application/json,.txt,.json,.mold,*/*');
-fileInput.addEventListener('change', e => {
-  loadMoldFile(e.target.files && e.target.files[0]);
-  fileInput.value = '';
-});
-
-window.addEventListener('dragover', e => e.preventDefault());
-window.addEventListener('drop', e => {
-  e.preventDefault();
-  const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-  if (f) loadMoldFile(f);
-});
 
 newCulture();
 updateFoodBtnUI();
