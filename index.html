@@ -16,9 +16,7 @@
       --white: #ffffff;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
@@ -62,12 +60,7 @@
       box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
     }
 
-    h1 {
-      margin: 0;
-      font-size: 28px;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-    }
+    h1 { margin: 0; font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; }
 
     .subtitle {
       margin: 9px 0 26px;
@@ -76,9 +69,7 @@
       line-height: 1.5;
     }
 
-    .field {
-      margin-bottom: 17px;
-    }
+    .field { margin-bottom: 17px; }
 
     label {
       display: block;
@@ -87,9 +78,7 @@
       margin-bottom: 8px;
     }
 
-    .input-wrap {
-      position: relative;
-    }
+    .input-wrap { position: relative; }
 
     input[type="email"],
     input[type="password"],
@@ -111,9 +100,7 @@
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
     }
 
-    .password-input {
-      padding-right: 70px !important;
-    }
+    .password-input { padding-right: 70px !important; }
 
     .toggle-password {
       position: absolute;
@@ -130,9 +117,7 @@
       border-radius: 8px;
     }
 
-    .toggle-password:hover {
-      background: var(--blue-soft);
-    }
+    .toggle-password:hover { background: var(--blue-soft); }
 
     .row {
       display: flex;
@@ -163,9 +148,7 @@
       font-weight: 650;
     }
 
-    .link:hover {
-      text-decoration: underline;
-    }
+    .link:hover { text-decoration: underline; }
 
     .submit {
       width: 100%;
@@ -181,13 +164,9 @@
       box-shadow: 0 10px 22px rgba(37, 99, 235, 0.20);
     }
 
-    .submit:hover {
-      background: var(--blue-dark);
-    }
-
-    .submit:active {
-      transform: translateY(1px);
-    }
+    .submit:hover { background: var(--blue-dark); }
+    .submit:active { transform: translateY(1px); }
+    .submit:disabled { opacity: .65; cursor: wait; }
 
     .status {
       min-height: 20px;
@@ -207,18 +186,9 @@
     }
 
     @media (max-width: 480px) {
-      body {
-        padding: 16px;
-      }
-
-      .card {
-        padding: 26px 20px;
-        border-radius: 18px;
-      }
-
-      h1 {
-        font-size: 25px;
-      }
+      body { padding: 16px; }
+      .card { padding: 26px 20px; border-radius: 18px; }
+      h1 { font-size: 25px; }
     }
   </style>
 </head>
@@ -229,14 +199,12 @@
     <section id="loginView">
       <h1>Welcome back</h1>
       <p class="subtitle">Sign in to continue to Pet Mold.</p>
-
       <form id="loginForm" novalidate>
         <div class="field">
           <label for="email">Email</label>
           <input id="email" name="email" type="email" autocomplete="email"
                  placeholder="you@example.com" required />
         </div>
-
         <div class="field">
           <label for="password">Password</label>
           <div class="input-wrap">
@@ -246,19 +214,17 @@
             <button type="button" class="toggle-password" id="togglePassword">Show</button>
           </div>
         </div>
-
         <div class="row">
           <label class="remember">
-            <input id="remember" type="checkbox" />
+            <input id="remember" type="checkbox" checked />
             <span>Remember me</span>
           </label>
           <a class="link" href="#" id="forgotLink">Forgot password?</a>
         </div>
 
-        <button class="submit" type="submit">Sign in</button>
+        <button class="submit" type="submit" id="loginButton">Sign in</button>
         <div class="status" id="loginStatus" role="status" aria-live="polite"></div>
       </form>
-
       <div class="signup">
         Don't have an account?
         <a class="link" href="#" id="showSignup">Create one</a>
@@ -268,20 +234,17 @@
     <section id="signupView" hidden>
       <h1>Create account</h1>
       <p class="subtitle">Make an account to save your Pet Mold progress.</p>
-
       <form id="signupForm" novalidate>
         <div class="field">
           <label for="signupName">Username</label>
           <input id="signupName" type="text" autocomplete="username"
                  placeholder="Choose a username" minlength="3" maxlength="24" required />
         </div>
-
         <div class="field">
           <label for="signupEmail">Email</label>
           <input id="signupEmail" type="email" autocomplete="email"
                  placeholder="you@example.com" required />
         </div>
-
         <div class="field">
           <label for="signupPassword">Password</label>
           <div class="input-wrap">
@@ -291,7 +254,6 @@
             <button type="button" class="toggle-password" data-target="signupPassword">Show</button>
           </div>
         </div>
-
         <div class="field">
           <label for="confirmPassword">Confirm password</label>
           <div class="input-wrap">
@@ -301,8 +263,7 @@
             <button type="button" class="toggle-password" data-target="confirmPassword">Show</button>
           </div>
         </div>
-
-        <button class="submit" type="submit">Create account</button>
+        <button class="submit" type="submit" id="signupButton">Create account</button>
         <div class="status" id="signupStatus" role="status" aria-live="polite"></div>
       </form>
 
@@ -313,15 +274,55 @@
     </section>
   </main>
 
+  <!-- Supabase JS v2 via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = "https://terlxwmdpzgyvhonxyjc.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_2xMTmKidtbqjKh7kQg3kLw_q17X-opL";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+
     const loginView = document.getElementById("loginView");
     const signupView = document.getElementById("signupView");
-
     const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");
-
     const loginStatus = document.getElementById("loginStatus");
     const signupStatus = document.getElementById("signupStatus");
+    const loginButton = document.getElementById("loginButton");
+    const signupButton = document.getElementById("signupButton");
+
+    function gameUrl() {
+      return new URL("game.html", window.location.href).href;
+    }
+
+    function authCallbackUrl() {
+      return new URL("index.html", window.location.href).href;
+    }
+
+    function isAuthCallback() {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      return (
+        hash.includes("access_token") ||
+        hash.includes("type=recovery") ||
+        search.includes("code=")
+      );
+    }
+
+    function setStatus(element, message, type = "error") {
+      element.style.color = type === "success" ? "#2563eb" : "#dc2626";
+      element.textContent = message;
+    }
 
     function showLogin() {
       loginView.hidden = false;
@@ -357,74 +358,173 @@
       });
     });
 
-    loginForm.addEventListener("submit", (event) => {
+    loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      loginStatus.style.color = "#dc2626";
-      loginStatus.textContent = "";
+      setStatus(loginStatus, "");
 
       const email = document.getElementById("email");
+      const password = document.getElementById("password");
 
       if (!email.checkValidity()) {
-        loginStatus.textContent = "Enter a valid email address.";
+        setStatus(loginStatus, "Enter a valid email address.");
         email.focus();
         return;
       }
 
-      if (document.getElementById("password").value.length < 6) {
-        loginStatus.textContent = "Password must be at least 6 characters.";
-        document.getElementById("password").focus();
+      if (password.value.length < 6) {
+        setStatus(loginStatus, "Password must be at least 6 characters.");
+        password.focus();
         return;
       }
 
-      // Demo only — connect this form to Netlify/Auth later.
-      loginStatus.style.color = "#2563eb";
-      loginStatus.textContent = "Login form is ready for backend authentication.";
+      loginButton.disabled = true;
+      loginButton.textContent = "Signing in...";
+      setStatus(loginStatus, "Checking your account...", "success");
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email.value.trim(),
+        password: password.value
+      });
+
+      loginButton.disabled = false;
+      loginButton.textContent = "Sign in";
+
+      if (error) {
+        setStatus(loginStatus, error.message);
+        return;
+      }
+
+      if (!data.session) {
+        setStatus(loginStatus, "Sign-in did not create a session. Please try again.");
+        return;
+      }
+
+      setStatus(loginStatus, "Login successful. Opening Pet Mold...", "success");
+      window.location.href = "game.html";
     });
 
-    signupForm.addEventListener("submit", (event) => {
+    signupForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      signupStatus.style.color = "#dc2626";
-      signupStatus.textContent = "";
+      setStatus(signupStatus, "");
 
       const username = document.getElementById("signupName");
       const email = document.getElementById("signupEmail");
       const password = document.getElementById("signupPassword");
       const confirm = document.getElementById("confirmPassword");
 
-      if (username.value.trim().length < 3) {
-        signupStatus.textContent = "Username must be at least 3 characters.";
+      const cleanUsername = username.value.trim();
+
+      if (cleanUsername.length < 3) {
+        setStatus(signupStatus, "Username must be at least 3 characters.");
+        username.focus();
+        return;
+      }
+
+      if (cleanUsername.length > 24) {
+        setStatus(signupStatus, "Username must be 24 characters or fewer.");
+        username.focus();
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9_ -]+$/.test(cleanUsername)) {
+        setStatus(signupStatus, "Username can only use letters, numbers, spaces, _ or -.");
         username.focus();
         return;
       }
 
       if (!email.checkValidity()) {
-        signupStatus.textContent = "Enter a valid email address.";
+        setStatus(signupStatus, "Enter a valid email address.");
         email.focus();
         return;
       }
 
       if (password.value.length < 6) {
-        signupStatus.textContent = "Password must be at least 6 characters.";
+        setStatus(signupStatus, "Password must be at least 6 characters.");
         password.focus();
         return;
       }
 
       if (password.value !== confirm.value) {
-        signupStatus.textContent = "Passwords do not match.";
+        setStatus(signupStatus, "Passwords do not match.");
         confirm.focus();
         return;
       }
 
-      // Demo only — no account is created until a backend is connected.
-      signupStatus.style.color = "#2563eb";
-      signupStatus.textContent = "Sign-up form is ready for backend authentication.";
+      signupButton.disabled = true;
+      signupButton.textContent = "Creating account...";
+      setStatus(signupStatus, "Creating your account...", "success");
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: email.value.trim(),
+        password: password.value,
+        options: {
+          data: {
+            username: cleanUsername
+          },
+          emailRedirectTo: authCallbackUrl()
+        }
+      });
+
+      signupButton.disabled = false;
+      signupButton.textContent = "Create account";
+
+      if (error) {
+        setStatus(signupStatus, error.message);
+        return;
+      }
+
+      if (data.session) {
+        setStatus(signupStatus, "Account created. Opening Pet Mold...", "success");
+        window.location.href = "game.html";
+        return;
+      }
+
+      setStatus(
+        signupStatus,
+        "Account created! Check your email to confirm your account, then sign in.",
+        "success"
+      );
     });
 
-    document.getElementById("forgotLink").addEventListener("click", (event) => {
+    document.getElementById("forgotLink").addEventListener("click", async (event) => {
       event.preventDefault();
-      loginStatus.style.color = "#2563eb";
-      loginStatus.textContent = "Password reset will be connected to your backend.";
+
+      const email = document.getElementById("email");
+      if (!email.checkValidity()) {
+        setStatus(loginStatus, "Enter your email first, then click Forgot password.");
+        email.focus();
+        return;
+      }
+
+      setStatus(loginStatus, "Sending password reset email...", "success");
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(
+        email.value.trim(),
+        { redirectTo: authCallbackUrl() }
+      );
+
+      if (error) {
+        setStatus(loginStatus, error.message);
+        return;
+      }
+
+      setStatus(loginStatus, "Password reset email sent. Check your inbox.", "success");
     });
+
+    // After an email confirmation or normal login, send the user into the game.
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session && !isAuthCallback()) {
+        window.location.href = "game.html";
+      }
+    });
+
+    // If the user is already signed in, skip the login screen.
+    (async () => {
+      const { data } = await supabaseClient.auth.getSession();
+      if (data.session && !isAuthCallback()) {
+        window.location.href = "game.html";
+      }
+    })();
   </script>
 </body>
 </html>
